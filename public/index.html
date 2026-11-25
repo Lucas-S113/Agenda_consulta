@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        * {
+            margin: 0;;
+        }
+
+        html, 
+        body{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        input,
+        button {
+          border: solid 1px black;
+          margin-bottom: 10px;
+          border-radius: 5px;
+        }
+        #bntlogin {
+        width: 173px;
+        }
+
+        body{
+            background-image: url("Logo_medicina.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+        #password_esqueci {
+            color: red;
+            display: flex;
+        }
+
+   </style>
+
+   <script>
+
+    async function enviar() {
+        var mensagem = document.getElementById("errado");
+        mensagem.innerText = "";
+
+        var usuario = document.getElementById("usuario").value.trim();
+        var senha = document.getElementById("senha").value;
+
+        try {
+            var resposta = await fetch(
+                `http://localhost:5500/login/${encodeURIComponent(usuario)}/${encodeURIComponent(senha)}`
+            );
+            var resultado = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(resultado.error || "Erro ao realizar login.");
+            }
+
+            if (resultado.CHECA === true) {
+                localStorage.setItem("NOME", resultado.NOME);
+                localStorage.setItem("agendaNome", resultado.NOME);
+                window.location.href = "agendamento.html";
+                return;
+            }
+
+            mensagem.innerText = "Usuário ou senha incorretos.";
+        } catch (error) {
+            console.error(error);
+            mensagem.innerText = "Não foi possível acessar a API em localhost:3000. Verifique se o servidor está iniciado.";
+        }
+    }
+
+</script>
+
+</head>
+
+
+<body>
+
+<div id="box">
+    <input id="usuario" type="text" placeholder="Digite seu usuário">
+    <input id="senha" type="password" placeholder="Digite sua senha">
+    <button id="bntlogin" onclick="enviar()">Login</button>
+    <p id="errado" role="alert"></p>
+    <div>
+    <p id="password_esqueci"><a href="login.html">cadastrar</a></p>
+
+    
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento de consulta</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("Logo_medicina.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+        }
+
+        #box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        h1 {
+            color: rgb(12, 228, 12);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: min(300px, 100%);
+        }
+
+        input,
+        textarea,
+        button {
+            border: 1px solid rgb(5, 5, 5);
+            border-radius: 5px;
+            padding: 8px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+
+    <script>
+        function agendar(event) {
+            event.preventDefault();
+
+            var paciente = document.getElementById("paciente").value.trim();
+            var especialista = document.getElementById("especialista").value.trim();
+            var data = document.getElementById("data").value;
+            var horario = document.getElementById("horario").value;
+            var motivo = document.getElementById("motivo").value.trim();
+
+            if (!paciente || !especialista || !data || !horario) {
+                alert("Preencha o nome, o especialista, a data e o horário da consulta.");
+                return;
+            }
+
+            // Se o motivo estiver vazio, envia "Nenhum" para evitar quebra na rota da URL
+            if (!motivo) {
+                motivo = "Nenhum";
+            }
+
+            // Comunicação GET alinhada com a tua API na porta 5500
+            fetch(`/agendar/${paciente}/${especialista}/${data}/${horario}/${motivo}`)
+                .then(response => response.text())
+                .then(dataRes => {
+                    if (dataRes === "OK") {
+                        alert("Consulta agendada com sucesso!");
+                        window.location.href = "index.html";
+                    } else {
+                        alert("Erro ao realizar o agendamento.");
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Não foi possível conectar ao servidor. Tente novamente.");
+                });
+        }
+
+        window.addEventListener("DOMContentLoaded", function () {
+            // Corrigido para buscar a chave correta gravada no login ("NOME")
+            var nome = localStorage.getItem("NOME");
+            if (nome) {
+                document.getElementById("paciente").value = nome;
+            }
+        });
+    </script>
+</head>
+<body>
+    <main id="box">
+        <h1>Agendar consulta</h1>
+        <form id="formAgendamento" onsubmit="agendar(event)">
+            <input id="paciente" name="paciente" type="text" placeholder="Nome do paciente" required>
+            <input id="especialista" name="especialista" type="text" placeholder="Especialista" required>
+            <input id="data" name="data" type="date" aria-label="Data da consulta" required>
+            <input id="horario" name="horario" type="time" aria-label="Horário da consulta" required>
+            <textarea id="motivo" name="motivo" placeholder="Motivo da consulta (opcional)"></textarea>
+            <button type="submit">Agendar</button>
+        </form>
+    </main>
+</body>
+</html>
